@@ -15,3 +15,10 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
     res.status(401).json({ message: 'Invalid token' });
   }
 };
+
+export const restrictTo = (...roles: string[]) =>
+  (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user!.role))
+      return res.status(403).json({ message: 'Access forbidden' });
+    next();
+  };
