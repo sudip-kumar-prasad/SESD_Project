@@ -1,72 +1,79 @@
 # ER Diagram
 
+![ER Diagram](file:///Users/sudipkumarprasad/Desktop/SESD_Project/diagrams/ErDiagram.png)
+
+The ER Diagram details the database schema and the relationships between different entities (User, Shop, Product, Order, and Delivery).
+
 ```mermaid
 erDiagram
-    USERS {
-        string _id
+    USER ||--o{ SHOP : "owns"
+    USER ||--o{ ORDER : "places (as customer)"
+    USER ||--o{ ORDER : "fulfills (as partner)"
+    SHOP ||--o{ PRODUCT : "contains"
+    SHOP ||--o{ ORDER : "receives"
+    ORDER ||--|{ ORDER_ITEM : "contains"
+    ORDER ||--|| DELIVERY : "tracks"
+    PRODUCT ||--o{ ORDER_ITEM : "ordered in"
+
+    USER {
+        ObjectId _id
         string name
         string email
         string password
         string phone
-        string role
+        string role "customer | shop_owner | delivery_partner | admin"
         string address
-        date created_at
     }
 
-    SHOPS {
-        string _id
-        string owner_id
-        string shop_name
+    SHOP {
+        ObjectId _id
+        ObjectId owner
+        string shopName
         string address
-        string location_lat_long
-        boolean is_open
+        number lat
+        number lng
+        boolean isOpen
+        string description
+        string phone
     }
 
-    PRODUCTS {
-        string _id
-        string shop_id
+    PRODUCT {
+        ObjectId _id
+        ObjectId shop
         string name
         string description
         number price
-        string image_url
-        number stock_quantity
-        boolean is_available
+        string imageUrl
+        number stockQuantity
+        boolean isAvailable
+        string category
     }
 
-    ORDERS {
-        string _id
-        string customer_id
-        string shop_id
-        string delivery_partner_id
-        string status
-        number total_amount
-        string payment_status
-        date created_at
+    ORDER {
+        ObjectId _id
+        ObjectId customer
+        ObjectId shop
+        ObjectId deliveryPartner
+        string status "PENDING | ACCEPTED | OUT_FOR_DELIVERY | DELIVERED"
+        number totalAmount
+        string paymentStatus "PENDING | PAID | FAILED"
+        string deliveryAddress
     }
 
-    ORDER_ITEMS {
-        string _id
-        string order_id
-        string product_id
+    ORDER_ITEM {
+        ObjectId product
+        string productName
         number quantity
-        number price_at_time
+        number priceAtTime
     }
 
-    DELIVERIES {
-        string _id
-        string order_id
-        string partner_id
-        string status
-        date pickup_time
-        date delivery_time
+    DELIVERY {
+        ObjectId _id
+        ObjectId order
+        ObjectId partner
+        string status "ASSIGNED | PICKED_UP | DELIVERED"
+        date pickupTime
+        date deliveryTime
+        string otp
     }
-
-    USERS ||--o{ SHOPS : owns
-    USERS ||--o{ ORDERS : places
-    SHOPS ||--o{ PRODUCTS : contains
-    SHOPS ||--o{ ORDERS : receives
-    ORDERS ||--|{ ORDER_ITEMS : contains
-    PRODUCTS ||--o{ ORDER_ITEMS : listed_in
-    USERS ||--o{ DELIVERIES : fulfills
-    ORDERS ||--|| DELIVERIES : triggers
 ```
