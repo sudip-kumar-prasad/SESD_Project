@@ -123,7 +123,7 @@ export default function CheckoutPage() {
                             </div>
                             <div className="space-y-1">
                                <h4 className="font-black text-slate-950 text-lg tracking-tight">{item.name}</h4>
-                               <p className="text-[11px] text-slate-400 font-bold mb-2 uppercase opacity-60">{item.unit || item.vol || 'Pcs'}</p>
+                               <p className="text-[11px] text-slate-400 font-bold mb-2 uppercase opacity-60">{(item as any).unit || (item as any).vol || 'Pcs'}</p>
                                <div className="text-[20px] font-black text-[#1a5d2e] tracking-tighter italic">₹{item.price.toFixed(2)}</div>
                             </div>
                          </div>

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, MessageSquare, Phone, Bell, Bike, CheckCircle2, 
-  Package, Home, Loader2, Heart, Share2, Info, MapPin, 
-  Clock, Star, Navigation
+  Package, Home, Loader2, Heart, Info, Star
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import api from '../api';

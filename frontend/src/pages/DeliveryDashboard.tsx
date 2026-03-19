@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  LogOut, Navigation, CheckCircle, Wallet, Filter, 
-  Bell, Headphones, Map as MapIcon, ChevronRight,
-  TrendingUp, Zap, Clock, Store, MapPin, Loader2, ShoppingBag
+  Navigation, CheckCircle, Wallet, Filter, 
+  Bell, Headphones, 
+  TrendingUp, Zap, Store, Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 export default function DeliveryDashboard() {
-  const { logout, user } = useAuth();
-  const navigate = useNavigate();
+  useAuth();
+  useNavigate();
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [availableTasks, setAvailableTasks] = useState<any[]>([]);
   const [activeTask, setActiveTask] = useState<any>(null);
@@ -209,7 +209,7 @@ export default function DeliveryDashboard() {
                   </div>
 
                   <div className="space-y-5">
-                    {availableTasks.map((task, idx) => (
+                    {availableTasks.map((task) => (
                       <div key={task._id} onClick={() => handleAcceptTask(task._id)} className="bg-white p-7 rounded-[40px] border border-[#f0f4f0] shadow-sm flex items-center justify-between group hover:shadow-2xl transition-all cursor-pointer hover:-translate-x-1 duration-500">
                          <div className="flex items-center gap-6">
                             <div className="w-16 h-16 bg-[#f8faf8] flex items-center justify-center rounded-[24px] border border-[#f0f4f0] group-hover:bg-[#e3f2e3] transition-colors text-2xl shadow-inner">

@@ -3,8 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import ShopOwnerDashboard from './pages/ShopOwnerDashboard';
-import DeliveryDashboard from './pages/DeliveryDashboard';
+
 import StorePage from './pages/StorePage';
 import CheckoutPage from './pages/CheckoutPage';
 import LiveTracking from './pages/LiveTracking';

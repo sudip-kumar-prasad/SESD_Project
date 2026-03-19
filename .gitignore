@@ -4,3 +4,10 @@ build/
 .env
 *.log
 .DS_Store
+.vite/
+frontend/.vite/
+backend/dist/
+frontend/dist/
+*.js.map
+*.d.ts
+!backend/src/**/*.d.ts # Only if you want to keep some, but general advice is to keep it clean.

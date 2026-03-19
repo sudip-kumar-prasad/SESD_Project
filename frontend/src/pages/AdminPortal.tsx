@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, ShoppingBag, Package, Wallet, Settings, 
-  Search, Bell, Users, Bike, Store, Clock, LogOut, Plus,
-  TrendingUp, AlertCircle, Map as MapIcon, ChevronRight, Loader2, IndianRupee
+  Search, Bell, Bike, Store, Clock, LogOut, Plus,
+  TrendingUp, Map as MapIcon, ChevronRight, Loader2, IndianRupee
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';

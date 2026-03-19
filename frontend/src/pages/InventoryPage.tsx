@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+
 import { 
-  Search, Plus, Filter, AlertTriangle, CheckCircle, Package, 
+  Search, Plus, AlertTriangle, CheckCircle, Package, 
   MoreVertical, LayoutDashboard, ShoppingBag, Wallet, Settings, 
-  LogOut, Loader2, ChevronRight, Store, Trash2, Eye, EyeOff,
-  ListFilter
+  Loader2, ChevronRight, ListFilter
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 export default function InventoryPage() {
-  const { logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Inventory');
+  const [_activeTab, setActiveTab] = useState('Inventory');
   const [activeCat, setActiveCat] = useState('All Items');
   const [shop, setShop] = useState<any>(null);
   const [inventoryList, setInventoryList] = useState<any[]>([]);
@@ -72,15 +70,6 @@ export default function InventoryPage() {
     }
   };
 
-  const handleDeleteItem = async (productId: string) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
-    try {
-      await api.delete(`/products/${productId}`);
-      if (shop) await fetchInventory(shop._id);
-    } catch (err) {
-      console.error('Failed to delete item:', err);
-    }
-  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-[#f2f7f2]">

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { 
-  Search, MapPin, ChevronRight, ShoppingCart, Star, Clock, ChevronLeft, 
-  Menu, Zap, AlertCircle, ShoppingBag, LayoutDashboard
+  Search, MapPin, ChevronRight, ShoppingCart, Star, Clock, ChevronLeft
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +10,7 @@ import { useCart } from '../context/CartContext';
 export default function Dashboard() {
   const [shops, setShops] = useState<any[]>([]);
   const [productList, setProductList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const { addToCart, totalItems } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();

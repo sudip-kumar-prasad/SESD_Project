@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  LogOut, Settings, LayoutDashboard, ShoppingBag, 
-  Wallet, Package, ChevronRight, Edit2, Shield,
-  Mail, Phone, Building, Loader2, Camera
+  LogOut, LayoutDashboard, ShoppingBag, 
+  Shield, Mail, Phone, Building, Loader2, Camera
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';

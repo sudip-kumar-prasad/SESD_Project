@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  LogIn, ShoppingBag, ShieldCheck, Mail, Lock, 
+  ShieldCheck, Mail, Lock, 
   HelpCircle, Globe, Zap, Store
 } from 'lucide-react';
 

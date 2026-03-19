@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
   User, Package, MapPin, CreditCard, Bell, 
-  HelpCircle, LogOut, Camera, ChevronRight,
+  HelpCircle, LogOut, Camera,
   Mail, Cake, Moon, MailQuestion, Trash2, Edit2,
   CheckCircle2, Loader2, ShoppingCart
 } from 'lucide-react';
@@ -202,7 +202,7 @@ export default function ProfilePage() {
                  <button className="text-[11px] font-black text-[#1a5d2e] uppercase tracking-[3px] italic hover:underline decoration-2">View All</button>
               </div>
               <div className="space-y-4">
-                 {orders.map((o, idx) => (
+                 {orders.map((o) => (
                    <div key={o._id} onClick={() => navigate(`/tracking/${o._id}`)} className="bg-white p-8 px-10 rounded-[40px] border border-white shadow-sm flex items-center justify-between group hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
                       <div className="flex items-center gap-8">
                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-colors ${

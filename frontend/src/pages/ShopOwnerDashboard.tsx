@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  LogOut, Package, ShoppingBag, IndianRupee, TrendingUp, 
+  Package, ShoppingBag, IndianRupee, TrendingUp, 
   AlertTriangle, Search, Bell, Settings, Plus, LayoutDashboard, 
-  Wallet, ChevronRight, Store, CreditCard, Info, Clock, Loader2
+  Wallet, ChevronRight, Info, Clock, Loader2
 } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 export default function ShopOwnerDashboard() {
-  const { logout, user } = useAuth();
+  useAuth() as any;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [stats, setStats] = useState<any>(null);
