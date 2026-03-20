@@ -28,6 +28,16 @@ const seed = async () => {
       address: 'HSR Layout, Bangalore'
     });
 
+    // 2. Create a Regular User
+    await User.create({
+      name: 'Sudip Kumar',
+      email: 'user@example.com',
+      password: hashedPassword,
+      role: 'customer',
+      phone: '9998887776',
+      address: 'HSR Layout, Sector 6, Bangalore'
+    });
+
     // 2. Create a Shop
     // Note: Schema uses 'shopName', 'lat', 'lng', 'isOpen', 'description', 'phone', 'imageUrl'
     const shop = await Shop.create({
