@@ -35,6 +35,10 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'KiranaQuick Backend is active' });
 });
 
+app.get('/api/products-check', (req, res) => {
+  res.status(200).json({ message: 'Products route should be active' });
+});
+
 const PORT = process.env.PORT || 5001;
 
 httpServer.listen(PORT, () => {
