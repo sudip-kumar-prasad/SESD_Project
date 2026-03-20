@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Navigation, CheckCircle, Wallet, Filter, 
-  Bell, Headphones, 
-  TrendingUp, Zap, Store, Loader2
+  LayoutGrid, Navigation, PieChart, Activity, 
+  Settings, Bell, Search, LogOut, HelpCircle,
+  Zap, Package, MapPin, Clock, ArrowRight,
+  TrendingUp, CloudRain, Info, CheckCircle2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 export default function DeliveryDashboard() {
-  useAuth();
-  useNavigate();
-  const [activeTab, setActiveTab] = useState('Dashboard');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('Available Orders');
   const [availableTasks, setAvailableTasks] = useState<any[]>([]);
   const [activeTask, setActiveTask] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,8 +28,6 @@ export default function DeliveryDashboard() {
         setActiveTask(activeRes.data);
       } catch (err) {
         console.error('Failed to fetch delivery data:', err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
@@ -45,256 +44,282 @@ export default function DeliveryDashboard() {
     }
   };
 
-  const handleUpdateStatus = async (orderId: string, status: string) => {
-    try {
-      await api.put(`/orders/${orderId}/delivery-status`, { status });
-      if (status === 'DELIVERED') {
-        setActiveTask(null);
-      } else {
-        const activeRes = await api.get('/orders/active-delivery');
-        setActiveTask(activeRes.data);
-      }
-    } catch (err) {
-      alert('Failed to update status');
-    }
-  };
+  const menuItems = [
+    { name: 'Available Orders', icon: LayoutGrid },
+    { name: 'Active Deliveries', icon: Navigation },
+    { name: 'Earnings Analytics', icon: PieChart },
+    { name: 'Performance', icon: Activity },
+  ];
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f2f7f2]"><Loader2 className="animate-spin text-[#1a5d2e]" size={48} /></div>;
+  const filters = [
+    { name: 'Distance: < 5km', icon: MapPin },
+    { name: 'Earning: > ₹60', icon: TrendingUp },
+    { name: 'Time: Immediate', icon: Clock },
+    { name: 'Express Only', icon: Zap },
+  ];
 
+  // Helper to get estimated earnings (Mocked for UI feel)
+  const getEarning = (amount: number) => Math.floor(amount * 0.15 + 30);
 
   return (
-    <div className="min-h-screen bg-[#f2f7f2] text-slate-900 font-sans selection:bg-[#1a5d2e] selection:text-white">
-      {/* Precision Header */}
-      <nav className="bg-white/80 backdrop-blur-md px-12 py-5 flex items-center justify-between sticky top-0 z-[100] border-b border-[#e9eee9]">
-        <div className="flex items-center gap-4">
-           <h1 className="text-[20px] font-black text-[#1a5d2e] tracking-tighter italic">KiranaQuick <span className="bg-[#e3f2e3] text-[#1a5d2e] text-[9px] px-3 py-1 rounded-md uppercase font-black not-italic ml-2 tracking-widest border border-white">Partner</span></h1>
+    <div className="flex min-h-screen bg-[#f2f7f2] font-sans selection:bg-[#1a5d2e] selection:text-white overflow-hidden">
+      
+      {/* Sidebar - Precise Match */}
+      <aside className="w-[320px] bg-[#0a1f10] text-white flex flex-col p-8 transition-all duration-500">
+        <div className="flex items-center gap-4 mb-12">
+          <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
+            <img 
+              src={`https://ui-avatars.com/api/?name=${user?.name || 'Partner'}&background=1a5d2e&color=fff`} 
+              alt="Partner" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <h3 className="text-sm font-black italic tracking-tight">Partner Portal</h3>
+            <p className="text-[10px] text-white/50 font-bold tracking-widest uppercase">Delivery Agent ID: #8821</p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-14">
-           <div className="flex items-center gap-10 text-[12px] font-black uppercase tracking-[3px] text-slate-400 italic">
-              <span 
-                className={`cursor-pointer transition-all ${activeTab === 'Dashboard' ? 'text-[#1a5d2e] border-b-2 border-[#1a5d2e] pb-1' : 'hover:text-slate-900'}`}
-                onClick={() => setActiveTab('Dashboard')}
-              >
-                Dashboard
-              </span>
-              <span className="hover:text-slate-900 cursor-pointer">History</span>
-              <span className="hover:text-slate-900 cursor-pointer">Earnings</span>
-           </div>
-           
-           <div className="flex items-center gap-6">
-              <div className="p-2.5 bg-[#f8faf8] rounded-2xl text-slate-400 cursor-pointer hover:bg-white hover:shadow-lg transition-all border border-slate-50 relative">
-                 <Bell size={20} />
-                 <div className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-              </div>
-              <div className="flex items-center gap-4 p-2 pl-2 pr-4 bg-[#f8faf8] rounded-full border border-slate-50 group hover:bg-white transition-all cursor-pointer">
-                 <img src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100" className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm" />
-                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-              </div>
-           </div>
+        <nav className="space-y-3 flex-1">
+          {menuItems.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => setActiveTab(item.name)}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[12px] font-black uppercase tracking-[2px] transition-all duration-300 italic ${
+                activeTab === item.name 
+                  ? 'bg-[#1a5d2e] text-white shadow-xl shadow-[#1a5d2e]/20 translate-x-2' 
+                  : 'text-white/40 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <item.icon size={20} strokeWidth={activeTab === item.name ? 3 : 2} />
+              {item.name}
+            </button>
+          ))}
+        </nav>
+
+        <div className="pt-8 border-t border-white/10 space-y-6">
+          <button 
+            onClick={() => setIsOnline(!isOnline)}
+            className={`w-full py-5 rounded-[24px] font-black text-[11px] uppercase tracking-[4px] italic flex items-center justify-center gap-3 transition-all ${
+              isOnline ? 'bg-[#1a5d2e] text-white shadow-xl shadow-[#1a5d2e]/30' : 'bg-red-500/10 text-red-500 border border-red-500/20'
+            }`}
+          >
+            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-red-500'}`}></div>
+            {isOnline ? 'Go Offline' : 'Go Online'}
+          </button>
+          
+          <div className="space-y-4 px-6">
+            <button className="flex items-center gap-4 text-[11px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors italic">
+              <HelpCircle size={18} /> Help Center
+            </button>
+            <button 
+              onClick={logout}
+              className="flex items-center gap-4 text-[11px] font-black text-white/40 uppercase tracking-widest hover:text-red-400 transition-colors italic"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          </div>
         </div>
-      </nav>
+      </aside>
 
-      <main className="max-w-[1600px] mx-auto p-12 lg:p-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-           
-           {/* Left Section: Active Session */}
-           <div className="lg:col-span-8 space-y-12 animate-in fade-in slide-in-from-left-6 duration-700">
-              <section className="bg-white p-12 rounded-[56px] shadow-sm border border-[#f0f4f0] relative overflow-hidden flex flex-col justify-between min-h-[540px]">
-                 <div className="absolute top-0 right-0 w-80 h-80 bg-[#1a5d2e]/5 -mr-20 -mt-20 rounded-full blur-3xl"></div>
-                 
-                 <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-12 px-4">
-                       <h2 className="text-[34px] font-black text-slate-950 italic tracking-tighter leading-none">Active Session</h2>
-                       <div className="bg-[#e3f2e3] text-[#1a5d2e] text-[10px] font-black px-5 py-2.5 rounded-full border border-white uppercase tracking-[4px] italic flex items-center gap-3 shadow-sm">
-                          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-                          ONLINE
-                       </div>
-                    </div>
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        {/* Header - Matching Image */}
+        <header className="px-12 py-8 flex items-center justify-between bg-white/50 backdrop-blur-xl border-b border-white/20">
+          <div className="flex items-center gap-3">
+             <span className="text-2xl font-black text-[#1a5d2e] tracking-tighter italic">KiranaQuick</span>
+             <span className="bg-[#e3f2e3] text-[#1a5d2e] text-[9px] px-3 py-1 rounded-md font-black uppercase tracking-widest border border-emerald-100">PARTNER</span>
+          </div>
 
-                     <div className="p-10 bg-[#f8faf8] rounded-[48px] border border-[#f0f4f0] shadow-inner group hover:bg-white hover:shadow-xl transition-all duration-500">
-                        {activeTask ? (
-                           <>
-                              <div className="flex items-start justify-between mb-12">
-                                 <div>
-                                    <div className="text-[11px] font-black text-orange-500 uppercase tracking-[3px] mb-3 italic opacity-80">CURRENT TASK</div>
-                                    <h3 className="text-[38px] font-black text-slate-950 italic tracking-tighter leading-none">Order #KQ-{activeTask._id.slice(-4).toUpperCase()}</h3>
-                                 </div>
-                                 <div className="text-right">
-                                    <div className="text-[38px] font-black text-[#1a5d2e] tracking-tighter leading-none italic">₹{activeTask.totalAmount.toLocaleString()}</div>
-                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[3px] italic mt-3 opacity-60">TOTAL VALUE</div>
-                                 </div>
-                              </div>
+          <div className="flex-1 max-w-xl mx-20">
+             <div className="relative group">
+                <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#1a5d2e] transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Search orders..." 
+                  className="w-full bg-white/80 border border-slate-100 px-14 py-4 rounded-3xl text-[12px] font-bold outline-none focus:ring-4 focus:ring-[#1a5d2e]/10 transition-all shadow-sm"
+                />
+             </div>
+          </div>
 
-                              <div className="space-y-10 relative px-4">
-                                 <div className="absolute left-[30px] top-4 bottom-4 w-0.5 border-l-2 border-dashed border-slate-200"></div>
-                                 
-                                 <div className="flex items-center justify-between relative">
-                                    <div className="flex items-center gap-8">
-                                       <div className="w-4 h-4 bg-emerald-500 rounded-full border-[3px] border-white shadow-[0_0_12px_rgba(16,185,129,0.3)] z-10"></div>
-                                       <div>
-                                          <div className="text-[10px] font-black text-slate-400 uppercase tracking-[3px] italic mb-1.5 opacity-60 leading-none">PICKUP</div>
-                                          <div className="text-xl font-black text-slate-950 italic tracking-tight leading-none">{activeTask.shop?.shopName}</div>
-                                       </div>
-                                    </div>
-                                 </div>
+          <div className="flex items-center gap-6">
+             <button className="p-3 bg-white rounded-2xl text-slate-400 hover:text-[#1a5d2e] transition-all shadow-sm border border-slate-50 relative">
+                <Bell size={20} />
+                <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
+             </button>
+             <button className="p-3 bg-white rounded-2xl text-slate-400 hover:text-[#1a5d2e] transition-all shadow-sm border border-slate-50">
+                <Settings size={20} />
+             </button>
+          </div>
+        </header>
 
-                                 <div className="flex items-center justify-between relative">
-                                    <div className="flex items-center gap-8">
-                                       <div className="w-4 h-4 bg-orange-500 rounded-full border-[3px] border-white shadow-[0_0_12px_rgba(249,115,22,0.3)] z-10"></div>
-                                       <div>
-                                          <div className="text-[10px] font-black text-slate-400 uppercase tracking-[3px] italic mb-1.5 opacity-60 leading-none">DROP</div>
-                                          <div className="text-xl font-black text-slate-950 italic tracking-tight leading-none truncate max-w-[300px]">{activeTask.customer?.address || activeTask.deliveryAddress}</div>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
+        {/* Scrollable View Area */}
+        <div className="flex-1 overflow-y-auto no-scrollbar p-12 lg:p-14 space-y-12">
+          
+          {/* Dashboard Intro */}
+          <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+             <div className="space-y-1">
+                <h2 className="text-[48px] font-black text-slate-900 tracking-tighter leading-tight italic">Available Orders</h2>
+                <div className="flex items-center gap-3 text-[12px] font-bold text-slate-400 italic font-medium">
+                  Current active demand in <span className="text-slate-900 font-black">HSR Layout, Bangalore</span>. Real-time updates active.
+                </div>
+             </div>
+             <div className="bg-[#e3f2e3] px-6 py-3 rounded-full border border-emerald-100 flex items-center gap-3 shadow-sm">
+                <Zap size={16} className="text-[#1a5d2e] fill-[#1a5d2e]" />
+                <span className="text-[10px] font-black uppercase tracking-[3px] text-[#1a5d2e] italic">Demand: High</span>
+             </div>
+          </section>
 
-                              <div className="flex gap-8 mt-12 px-2 relative z-10">
-                                 <button className="flex-1 p-6 bg-[#f8faf8] text-slate-950 border border-slate-100 rounded-[32px] font-black text-[13px] uppercase tracking-[4px] italic flex items-center justify-center gap-4 hover:bg-white hover:shadow-2xl transition-all active:scale-[0.98] group overflow-hidden">
-                                    <Navigation size={22} className="rotate-45 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> 
-                                    Navigate
-                                 </button>
-                                 <button 
-                                    onClick={() => handleUpdateStatus(activeTask._id, activeTask.status === 'ACCEPTED' ? 'PICKED_UP' : 'DELIVERED')}
-                                    className="flex-1 p-6 bg-[#1a5d2e] text-white rounded-[32px] font-black text-[13px] uppercase tracking-[4px] italic flex items-center justify-center gap-4 shadow-2xl shadow-[#1a5d2e]/20 hover:bg-[#123e1e] active:scale-[0.98] transition-all group overflow-hidden"
-                                 >
-                                    <CheckCircle size={22} className="group-hover:scale-110 transition-transform" /> 
-                                    {activeTask.status === 'ACCEPTED' ? 'Confirm Pickup' : 'Mark Delivered'}
-                                 </button>
-                              </div>
-                           </>
-                        ) : (
-                           <div className="py-20 text-center space-y-4">
-                              <Zap className="mx-auto text-slate-200" size={48} />
-                              <p className="text-slate-400 font-black italic uppercase tracking-widest leading-none">No active task. Accept one from the sidebar.</p>
+          {/* Filter Bar */}
+          <section className="flex flex-wrap gap-4">
+             {filters.map((f) => (
+                <button key={f.name} className="px-6 py-4 bg-white border border-slate-100 rounded-3xl flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:border-[#1a5d2e] hover:text-[#1a5d2e] transition-all shadow-sm italic group">
+                   <f.icon size={16} className="group-hover:scale-110 transition-transform" />
+                   {f.name}
+                </button>
+             ))}
+          </section>
+
+          {/* Order Grid */}
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+             {availableTasks.length > 0 ? (
+                availableTasks.map((task) => (
+                  <div key={task._id} className="bg-white p-10 rounded-[44px] shadow-sm border border-slate-50 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group flex flex-col justify-between min-h-[460px]">
+                     <div className="space-y-10">
+                        <div className="flex items-start justify-between">
+                           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-[#1a5d2e] rounded-xl border border-emerald-100">
+                              <Zap size={12} className="fill-[#1a5d2e]" />
+                              <span className="text-[9px] font-black uppercase tracking-widest italic">Express</span>
                            </div>
-                        )}
+                           <div className="text-right">
+                              <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1 italic">Est. Earning</p>
+                              <p className="text-3xl font-black text-slate-900 tracking-tighter italic">₹{getEarning(task.totalAmount)}.00</p>
+                           </div>
+                        </div>
+
+                        <div className="relative space-y-10 pl-4 before:content-[''] before:absolute before:left-[21px] before:top-4 before:bottom-4 before:w-[2px] before:border-l-2 before:border-dashed before:border-slate-100">
+                           <div className="flex items-center gap-6 relative z-10">
+                              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border-4 border-[#f2f7f2] shadow-xl group-hover:rotate-6 transition-all text-slate-400">
+                                 <Package size={24} />
+                              </div>
+                              <div>
+                                 <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1 italic">Pickup</p>
+                                 <h4 className="text-[17px] font-black text-slate-900 italic tracking-tight leading-none truncate max-w-[180px]">{task.shop?.shopName}</h4>
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-6 relative z-10">
+                              <div className="w-12 h-12 bg-[#1a5d2e] rounded-2xl flex items-center justify-center border-4 border-white shadow-xl shadow-[#1a5d2e]/20">
+                                 <MapPin size={24} className="text-white" />
+                              </div>
+                              <div>
+                                 <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1 italic">Drop-off</p>
+                                 <h4 className="text-[17px] font-black text-slate-900 italic tracking-tight leading-none truncate max-w-[180px]">{task.deliveryAddress?.slice(0, 20)}...</h4>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 bg-[#f8faf8] p-5 rounded-[32px] border border-slate-50">
+                           <div>
+                              <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic mb-1">Distance</p>
+                              <p className="text-sm font-black text-slate-900 flex items-center gap-2 italic">1.2 km</p>
+                           </div>
+                           <div>
+                              <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic mb-1">Items</p>
+                              <p className="text-sm font-black text-slate-900 flex items-center gap-2 italic">{task.items?.length} Units</p>
+                           </div>
+                        </div>
                      </div>
-                  </div>
-              </section>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                 <section className="bg-white p-12 rounded-[56px] shadow-sm border border-[#f0f4f0] group hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                    <div className="w-16 h-16 bg-[#f8faf8] text-slate-300 rounded-[28px] flex items-center justify-center mb-10 shadow-inner group-hover:bg-[#e3f2e3] group-hover:text-[#1a5d2e] transition-all border border-[#f0f4f0]">
-                       <Wallet size={32} />
-                    </div>
-                    <div className="text-[52px] font-black text-slate-950 tracking-tighter italic leading-none">₹1,240</div>
-                    <div className="text-[11px] text-slate-400 font-black uppercase tracking-[4px] mt-6 italic opacity-60">TODAY'S TOTAL</div>
-                 </section>
-                 
-                 <section className="bg-[#e3f2e3] p-12 rounded-[56px] shadow-sm border border-white group hover:shadow-2xl transition-all duration-500 h-[280px] flex flex-col justify-between cursor-pointer">
-                    <div className="flex items-center justify-between">
-                       <div className="w-16 h-16 bg-white/60 backdrop-blur-md text-[#1a5d2e] rounded-[28px] flex items-center justify-center shadow-sm group-hover:rotate-12 transition-transform">
-                          <TrendingUp size={32} />
-                       </div>
-                       <div className="bg-[#1a5d2e] text-white text-[10px] font-black px-4 py-2 rounded-xl italic shadow-xl shadow-[#1a5d2e]/20 tracking-widest">98% Score</div>
-                    </div>
-                    <div>
-                       <div className="text-[52px] font-black text-slate-950 tracking-tighter italic leading-none">12</div>
-                       <div className="text-[11px] text-slate-400 font-black uppercase tracking-[4px] mt-6 italic opacity-60">DELIVERIES</div>
-                    </div>
-                 </section>
-              </div>
-           </div>
-
-           {/* Right Section: Tasks & Goal Dashboard */}
-           <div className="lg:col-span-4 space-y-12 animate-in fade-in slide-in-from-right-6 duration-700">
-               <section className="bg-white p-12 rounded-[56px] shadow-sm border border-[#f0f4f0] space-y-10">
-                  <div className="flex items-center justify-between px-4">
-                     <h3 className="text-[26px] font-black text-slate-950 italic tracking-tighter leading-none">Available Tasks ({availableTasks.length})</h3>
-                     <button className="w-12 h-12 bg-white rounded-2xl border border-[#f0f4f0] flex items-center justify-center text-slate-400 hover:text-[#1a5d2e] transition-all shadow-sm hover:rotate-6">
-                        <Filter size={20}/>
+                     <button 
+                       onClick={() => handleAcceptTask(task._id)}
+                       className="w-full mt-10 py-6 bg-[#1a2b1f] text-white rounded-[32px] font-black text-[11px] uppercase tracking-[4px] italic flex items-center justify-center gap-3 shadow-xl group-hover:bg-[#1a5d2e] active:scale-95 transition-all"
+                     >
+                        Accept Express Task <ArrowRight size={18} />
                      </button>
                   </div>
+                ))
+             ) : (
+                <div className="col-span-full py-20 text-center space-y-6">
+                   <div className="text-[200px] font-black text-slate-200/20 italic absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none tracking-tighter">KQ</div>
+                   <Package size={64} className="mx-auto text-slate-200" />
+                   <p className="text-slate-400 font-black italic uppercase tracking-[5px] text-sm">Searching for new orders...</p>
+                   <button 
+                    onClick={() => window.location.reload()}
+                    className="px-10 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest italic hover:bg-slate-50 transition-all shadow-sm"
+                   >
+                    Refresh Feed
+                   </button>
+                </div>
+             )}
+          </section>
 
-                  <div className="space-y-5">
-                    {availableTasks.map((task) => (
-                      <div key={task._id} onClick={() => handleAcceptTask(task._id)} className="bg-white p-7 rounded-[40px] border border-[#f0f4f0] shadow-sm flex items-center justify-between group hover:shadow-2xl transition-all cursor-pointer hover:-translate-x-1 duration-500">
-                         <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 bg-[#f8faf8] flex items-center justify-center rounded-[24px] border border-[#f0f4f0] group-hover:bg-[#e3f2e3] transition-colors text-2xl shadow-inner">
-                               <Store className="text-[#1a5d2e]" size={28} />
-                            </div>
-                            <div>
-                               <h4 className="font-black text-slate-950 italic text-[15px] tracking-tight leading-none">{task.shop?.shopName}</h4>
-                               <div className="flex gap-4 mt-3">
-                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] italic leading-none flex items-center gap-2">📍 {task.shop?.address?.slice(0, 15)}...</p>
-                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[2px] italic leading-none flex items-center gap-2">🏁 Pay: ₹45</p>
-                               </div>
-                            </div>
-                         </div>
-                         <div className="text-[20px] font-black text-[#1a5d2e] tracking-tighter italic">Accept</div>
+          {/* Banner Section - Rain Surge */}
+          <section className="bg-[#0f2d1a] p-12 lg:p-14 rounded-[64px] relative overflow-hidden text-white group cursor-default">
+             {/* Abstract Clouds/Rain using lucide icons and containers */}
+             <div className="absolute right-20 top-0 bottom-0 flex items-center gap-10 opacity-10 group-hover:opacity-20 transition-all duration-1000 rotate-12">
+                <CloudRain size={120} strokeWidth={1}/>
+                <CloudRain size={180} strokeWidth={1} className="mt-20 translate-x-12"/>
+                <CloudRain size={120} strokeWidth={1} className="-mt-12"/>
+             </div>
+
+             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+                <div className="space-y-8 max-w-xl text-center lg:text-left">
+                   <h3 className="text-4xl md:text-5xl font-black italic tracking-tighter leading-[0.9]">Rain Surge: <span className="text-emerald-400 underline decoration-white/20 underline-offset-8">1.5x Earnings</span> Active</h3>
+                   <p className="text-[14px] font-bold leading-relaxed text-white/60 italic lg:pr-12">It's raining in your zone. Complete 5 more tasks before 10 PM to unlock a bonus of <span className="text-white font-black text-lg mx-1 tracking-tight italic">₹250</span> on top of your surge earnings.</p>
+                   
+                   <div className="space-y-4">
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[3px] italic px-1">
+                         <span>Bonus Progress</span>
+                         <span className="text-emerald-400">3/5 Tasks</span>
                       </div>
-                    ))}
-                    {availableTasks.length === 0 && <div className="py-10 text-center text-slate-300 font-black italic uppercase tracking-widest">Searching for tasks...</div>}
-                  </div>
-               </section>
+                      <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden shadow-inner border border-white/5">
+                         <div className="h-full bg-white transition-all duration-1000 shadow-[0_0_15px_white]" style={{ width: '60%' }}></div>
+                      </div>
+                   </div>
+                </div>
 
-              {/* Weekly Summary - High Fidelity Match */}
-              <section className="bg-[#8b4513] p-12 rounded-[56px] shadow-[0_32px_64px_rgba(139,69,19,0.15)] relative overflow-hidden text-white group cursor-pointer active:scale-[0.98] transition-all h-[280px] flex flex-col justify-between">
-                 <div className="absolute top-0 right-0 w-44 h-44 bg-white/10 -mr-16 -mt-16 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
-                 <div className="absolute bottom-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform">
-                    <TrendingUp size={120} strokeWidth={3} />
-                 </div>
-                 
-                 <div className="relative z-10">
-                    <div className="text-[10px] font-black uppercase tracking-[5px] text-white/50 mb-10 italic leading-none">WEEKLY SUMMARY</div>
-                    <div className="text-[44px] font-black italic tracking-tighter leading-none">₹8,450.00</div>
-                 </div>
+                <div className="bg-white/95 backdrop-blur-md p-10 rounded-[56px] shadow-2xl flex flex-col items-center justify-center text-center space-y-4 border border-white/20 min-w-[320px] hover:scale-105 transition-transform">
+                    <div className="w-16 h-16 bg-[#e3f2e3] rounded-3xl flex items-center justify-center text-[#1a5d2e] shadow-inner mb-4">
+                       <Headphones size={32} />
+                    </div>
+                    <h5 className="text-[12px] font-black text-slate-900 uppercase tracking-[4px] italic">SUPPORT ONLINE</h5>
+                    <p className="text-[10px] font-bold text-slate-400 italic">Help is a tap away</p>
+                    <button className="text-[11px] font-black text-[#1a5d2e] uppercase tracking-[3px] pt-4 italic border-t border-slate-100 w-full mt-4 hover:underline">Chat with Support</button>
+                </div>
+             </div>
+          </section>
 
-                 <div className="relative z-10 space-y-4">
-                    <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                       <div className="h-full bg-white transition-all duration-1000 shadow-[0_0_15px_white]" style={{ width: '84.5%' }}></div>
-                    </div>
-                    <p className="text-[11px] text-white/70 font-black italic tracking-widest uppercase leading-none px-1">
-                       ₹1,550 more to reach Weekly Goal
-                    </p>
-                 </div>
-              </section>
-
-              {/* Live Map Pip - Rounded Precision */}
-              <div className="relative flex items-center justify-center pt-8">
-                 <div className="w-[300px] h-[300px] rounded-full border-[10px] border-white shadow-[0_40px_80px_rgba(0,0,0,0.1)] overflow-hidden relative group cursor-pointer">
-                    {/* Mock Map Illustative Background */}
-                    <div className="absolute inset-0 bg-[#e3f2e3]">
-                       <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 gap-4 p-8 opacity-20">
-                          {[...Array(16)].map((_, i) => <div key={i} className="border-2 border-[#1a5d2e] rounded-full bg-white"></div>)}
-                       </div>
-                       <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-[180px] h-[180px] bg-[#1a5d2e]/10 rounded-full border-[40px] border-[#1a5d2e]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-[3s]">
-                             <Home className="text-[#1a5d2e] animate-bounce-slow" size={64} fill="currentColor" opacity="0.3" />
-                          </div>
-                       </div>
-                    </div>
-                    
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-                       <div className="bg-white/95 backdrop-blur-md px-10 py-4 rounded-[28px] shadow-2xl border border-white group-hover:scale-105 transition-all">
-                          <div className="text-[12px] font-black text-[#1a5d2e] uppercase tracking-[4px] leading-none mb-2 italic">LIVE MAP</div>
-                          <div className="text-[9px] font-black italic text-slate-400 uppercase tracking-widest opacity-60 leading-none">DELIVERY AREA: HSR SEC-7</div>
-                          <div className="text-[10px] font-black text-slate-950 uppercase tracking-[3px] mt-4 leading-none decoration-emerald-500 underline underline-offset-4">Safe Site Work</div>
-                       </div>
-                    </div>
-                    
-                    <div className="absolute bottom-10 right-10 w-14 h-14 bg-[#ff6b21] rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-950/40 hover:scale-110 active:scale-95 transition-all cursor-pointer">
-                       <Headphones size={24} strokeWidth={2.5} />
-                    </div>
-                 </div>
-              </div>
-           </div>
         </div>
       </main>
+
+      {/* Floating Active Task Summary (Hidden if no active task) */}
+      {activeTask && (
+        <div className="fixed bottom-12 right-12 bg-[#1a5d2e] text-white p-8 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(26,93,46,0.5)] z-[200] flex items-center gap-10 border-4 border-white animate-in zoom-in slide-in-from-bottom-12 duration-700">
+           <div className="space-y-1">
+              <p className="text-[8px] font-black text-white/50 uppercase tracking-[3px] italic">CURRENT ACTIVE TASK</p>
+              <h5 className="text-xl font-black italic tracking-tight">Order #KQ-{activeTask._id.slice(-4).toUpperCase()}</h5>
+           </div>
+           <button 
+            onClick={() => navigate('/delivery-dashboard')}
+            className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white hover:text-[#1a5d2e] transition-all"
+           >
+              <ArrowRight size={24} />
+           </button>
+        </div>
+      )}
     </div>
   );
 }
 
-// Simple Home icon for the map marker
-function Home(props: any) {
+// Headphones icon replacement or other components needed
+function Headphones(props: any) {
   return (
     <svg 
       {...props}
       xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
     >
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      <path d="M3 14c0-4.4 3.6-8 8-8s8 3.6 8 8v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Z"/><path d="M7 14h.01"/><path d="M17 14h.01"/>
     </svg>
   );
 }
