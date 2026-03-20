@@ -4,6 +4,7 @@ import { protect, authorize } from '../middlewares/auth.middleware';
 
 const router = Router();
 
+router.get('/', productController.getAllProducts);
 router.get('/shop/:shopId', productController.getProductsByShop);
 router.post('/', protect, authorize('shop_owner'), productController.addProduct);
 router.put('/:id', protect, authorize('shop_owner'), productController.updateProduct);

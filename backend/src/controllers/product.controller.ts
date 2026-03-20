@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import Product from '../models/Product';
 import Shop from '../models/Shop';
 import { AuthRequest } from '../middlewares/auth.middleware';
@@ -21,6 +21,15 @@ class ProductController {
   public getProductsByShop = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const products = await Product.find({ shop: req.params.shopId });
+      res.status(200).json(products);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  public getAllProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const products = await Product.find({ isAvailable: true }).populate('shop', 'shopName');
       res.status(200).json(products);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
