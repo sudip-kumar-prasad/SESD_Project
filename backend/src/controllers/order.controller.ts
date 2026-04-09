@@ -39,3 +39,14 @@ export const rejectOrder = async (req: AuthRequest, res: Response) => {
     res.json(order);
   } catch (err: any) { res.status(500).json({ message: err.message }); }
 };
+
+export const getShopStats = async (req: AuthRequest, res: Response) => {
+  try {
+    const shop = await Shop.findOne({ owner: req.user!.id });
+    if (!shop) return res.status(404).json({ message: 'Shop not found' });
+    const orders = await Order.find({ shop: shop._id });
+    const revenue = orders.filter((o: any) => o.status === 'DELIVERED').reduce((sum: number, o: any) => sum + o.totalAmount, 0);
+    const activeOrders = orders.filter((o: any) => ['PENDING','ACCEPTED'].includes(o.status)).length;
+    res.json({ revenue, activeOrders, totalOrders: orders.length, lowStockCount: 0 });
+  } catch (err: any) { res.status(500).json({ message: err.message }); }
+};
