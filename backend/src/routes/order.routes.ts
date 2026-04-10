@@ -11,3 +11,4 @@ router.put('/:id/reject', protect, rejectOrder);
 
 export default router;
 // real-time order flow endpoints
+// admin dispute resolution route placeholder
