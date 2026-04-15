@@ -50,3 +50,21 @@ export const getShopStats = async (req: AuthRequest, res: Response) => {
     res.json({ revenue, activeOrders, totalOrders: orders.length, lowStockCount: 0 });
   } catch (err: any) { res.status(500).json({ message: err.message }); }
 };
+
+export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const { status } = req.body;
+    const validTransitions: Record<string, string[]> = {
+      PENDING: ['ACCEPTED', 'REJECTED'],
+      ACCEPTED: ['OUT_FOR_DELIVERY'],
+      OUT_FOR_DELIVERY: ['DELIVERED'],
+    };
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!validTransitions[order.status]?.includes(status))
+      return res.status(400).json({ message: `Invalid transition: ${order.status} -> ${status}` });
+    order.status = status;
+    await order.save();
+    res.json(order);
+  } catch (err: any) { res.status(500).json({ message: err.message }); }
+};
