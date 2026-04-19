@@ -1,17 +1,14 @@
 import mongoose from 'mongoose';
 
-class Database {
-  private static instance: Database;
-  private constructor() {}
-  static getInstance(): Database {
-    if (!Database.instance) Database.instance = new Database();
-    return Database.instance;
+const connectDB = async (): Promise<void> => {
+  try {
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/kiranaquick';
+    const conn = await mongoose.connect(mongoUri);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
   }
-  async connect(): Promise<void> {
-    const uri = process.env.MONGO_URI!;
-    await mongoose.connect(uri);
-    console.log('[DB] MongoDB connected');
-  }
-}
+};
 
-export default Database.getInstance();
+export default connectDB;

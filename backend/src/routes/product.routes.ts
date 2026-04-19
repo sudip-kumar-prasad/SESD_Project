@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { getProductsByShop, createProduct, toggleProductAvailability, deleteProduct } from '../controllers/product.controller';
-import { protect } from '../middlewares/auth.middleware';
+import { productController } from '../controllers/product.controller';
+import { protect, authorize } from '../middlewares/auth.middleware';
 
 const router = Router();
-router.get('/shop/:shopId', getProductsByShop);
-router.post('/', protect, createProduct);
-router.patch('/:id/toggle', protect, toggleProductAvailability);
-router.delete('/:id', protect, deleteProduct);
+
+router.get('/shop/:shopId', productController.getProductsByShop);
+router.post('/', protect, authorize('shop_owner'), productController.addProduct);
+router.put('/:id', protect, authorize('shop_owner'), productController.updateProduct);
+router.delete('/:id', protect, authorize('shop_owner'), productController.deleteProduct);
+router.patch('/:id/toggle', protect, authorize('shop_owner'), productController.toggleAvailability);
 
 export default router;

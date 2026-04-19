@@ -282,4 +282,3 @@ export default function LiveTracking() {
     </div>
   );
 }
-// map path visualization layer

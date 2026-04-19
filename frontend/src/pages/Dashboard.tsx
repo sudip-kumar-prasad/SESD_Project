@@ -258,4 +258,3 @@ export default function Dashboard() {
     </div>
   );
 }
-// Customer dashboard v1.0
