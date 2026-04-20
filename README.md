@@ -2,6 +2,10 @@
 
 ShopSmart is a modern, full-stack hyperlocal e-commerce platform designed to digitalize local "Kirana" stores and streamline community-driven commerce. Built with a focus on speed, security, and real-time transparency, it provides a unified experience for customers, shop owners, and delivery partners.
 
+## 🌐 Live Deployment
+- **Frontend**: [https://sesd-project-nine.vercel.app](https://sesd-project-nine.vercel.app)
+- **Backend API**: [https://sesd-project-backend.onrender.com](https://sesd-project-backend.onrender.com) (Example)
+
 ## 🚀 Key Features
 
 - **Role-Based Access Control (RBAC)**: Distinct portals for Customers, Shop Owners, Delivery Partners, and Admins.
@@ -51,7 +55,8 @@ ShopSmart is a modern, full-stack hyperlocal e-commerce platform designed to dig
 
 ## 📊 Architecture & Documentation
 
-Comprehensive architecture diagrams are available in the `/diagrams` directory:
+Comprehensive architecture diagrams and project vision are available:
+- [Project Idea & Vision](Idea.md): Core problem, solution, and innovation areas.
 - [ER Diagram](ErDiagram.md): Database schema and relationships.
 - [Class Diagram](ClassDiagram.md): Backend structure and logic.
 - [Sequence Diagram](SequenceDiagram.md): Order fulfillment workflow.
